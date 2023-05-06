@@ -48,13 +48,11 @@ export default function Sidebar() {
             <div className="md:min-w-full md:hidden block pb-4 mb-4 border-b border-solid border-slate-200">
               <div className="flex flex-wrap">
                 <div className="w-6/12">
-                  <Link href="/">
-                    <a
-                      href="#pablo"
-                      className="md:block text-left md:pb-2  mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-                    >
-                      ID Express Logistik
-                    </a>
+                  <Link
+                    href="/"
+                    className="md:block text-left md:pb-2  mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
+                  >
+                    ID Express Logistik
                   </Link>
                 </div>
                 <div className="w-6/12 flex justify-end">
@@ -79,173 +77,157 @@ export default function Sidebar() {
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none ">
               <li className="items-center">
-                <Link href="/admin/dashboard">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/dashboard"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/dashboard") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-tv mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/dashboard") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-25"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-tv mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/dashboard") !== -1
-                          ? "opacity-25"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Dashboard
-                  </a>
+                  ></i>{" "}
+                  Dashboard
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/data">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/data"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/data") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-chart-bar mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/data") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-chart-bar mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/data") !== -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Data
-                  </a>
+                  ></i>{" "}
+                  Data
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/kriteriapenilaian">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/kriteriapenilaian"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/kriteriapenilaian") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-table mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/kriteriapenilaian") !==
                       -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-table mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/kriteriapenilaian") !==
-                        -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Kriteria Penilaian
-                  </a>
+                  ></i>{" "}
+                  Kriteria Penilaian
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/bobotkriteria">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/bobotkriteria"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/bobotkriteria") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-layer-group mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/bobotkriteria") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-layer-group mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/bobotkriteria") !== -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Bobot Kriteria
-                  </a>
+                  ></i>{" "}
+                  Bobot Kriteria
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/aturanpenilaian">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/aturanpenilaian"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/aturanpenilaian") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-book mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/aturanpenilaian") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-book mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/aturanpenilaian") !==
-                        -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Aturan Penilaian
-                  </a>
+                  ></i>{" "}
+                  Aturan Penilaian
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/jeniskendaraan">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/jeniskendaraan"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/jeniskendaraan") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-truck mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/jeniskendaraan") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-truck mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/jeniskendaraan") !== -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>
-                    Jenis Kendaraan
-                  </a>
+                  ></i>
+                  Jenis Kendaraan
                 </Link>
               </li>
 
               <li className="items-center">
-                <Link href="/admin/perhitungan">
-                  <a
-                    href="#pablo"
+                <Link
+                  href="/admin/perhitungan"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/perhitungan") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
                     className={
-                      "text-xs uppercase py-3 font-bold block " +
+                      "fas fa-percent mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/perhitungan") !== -1
-                        ? "text-red-500 hover:text-red-600"
-                        : "text-slate-700 hover:text-slate-500")
+                        ? "opacity-75"
+                        : "text-slate-300")
                     }
-                  >
-                    <i
-                      className={
-                        "fas fa-percent mr-2 text-sm " +
-                        (router.pathname.indexOf("/admin/perhitungan") !== -1
-                          ? "opacity-75"
-                          : "text-slate-300")
-                      }
-                    ></i>{" "}
-                    Perhitungan
-                  </a>
+                  ></i>{" "}
+                  Perhitungan
                 </Link>
               </li>
             </ul>
