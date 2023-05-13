@@ -23,9 +23,9 @@ export default function HeaderStats() {
               </div>
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
-                  statSubtitle="TOTAL ADMIN"
+                  statSubtitle="TOTAL JENIS KENDARAAN"
                   statTitle="2,356"
-                  statIconName="fas fa-users"
+                  statIconName="fas fa-truck"
                   statIconColor="bg-orange-500"
                 />
               </div>

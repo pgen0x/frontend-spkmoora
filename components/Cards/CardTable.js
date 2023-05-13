@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import PropTypes from "prop-types";
-
+import Link from "next/link";
 import {
   useTable,
   useResizeColumns,
@@ -50,42 +50,48 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
         }
       >
         <div className="rounded-t mb-0 px-2 py-3 border-0">
-          <div className="flex flex-wrap items-center">
-            <div className="relative w-full px-4 max-w-full flex-grow flex-1">
-              <h3
-                className={
-                  "font-semibold text-lg " +
-                  (color === "light" ? "text-slate-700" : "text-white")
-                }
-              >
-                Tabel {tableTitle}
-              </h3>
-            </div>
-            <div className="px-2">
-              <a
-                href={
-                  tableTitle === "Aturan Penilaian"
-                    ? "/admin/inputaturanpenilaian"
-                    : tableTitle === "Kriteria Penilaian"
-                    ? "/admin/inputkriteriapenilaian"
-                    : tableTitle === "Data"
-                    ? "/admin/inputdata"
-                    : tableTitle === "Jenis Kendaraan"
-                    ? "/admin/inputjeniskendaraan"
-                    : tableTitle === "Bobot Kriteria"
-                    ? "/admin/inputbobotkriteria"
-                    : "/admin/dashboard"
-                }
-              >
-                <button
-                  className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                  type="button"
+          {tableTitle !== "Hitung Data" && (
+            <div className="flex flex-wrap items-center">
+              <div className="relative w-full px-4 max-w-full flex-grow flex-1">
+                <h3
+                  className={
+                    "font-semibold text-lg " +
+                    (color === "light" ? "text-slate-700" : "text-white")
+                  }
                 >
-                  <i className="fas fa-plus mr-1"></i> Tambah {tableTitle}
-                </button>
-              </a>
+                  Tabel {tableTitle}
+                </h3>
+              </div>
+              <div className="px-2">
+                {tableTitle !== "Penilaian Alternatif" &&
+                  tableTitle !== "Nilai Perhitungan Yi" &&
+                  tableTitle !== "Hasil Penilaian dan Keputusan" && (
+                    <Link
+                      href={
+                        tableTitle === "Aturan Penilaian"
+                          ? "/admin/aturanpenilaian/tambah"
+                          : tableTitle === "Kriteria Penilaian"
+                          ? "/admin/kriteriapenilaian/tambah"
+                          : tableTitle === "Data"
+                          ? "/admin/data/tambah"
+                          : tableTitle === "Jenis Kendaraan"
+                          ? "/admin/jeniskendaraan/tambah"
+                          : tableTitle === "Bobot Kriteria"
+                          ? "/admin/bobotkriteria/tambah"
+                          : "/admin/dashboard"
+                      }
+                    >
+                      <button
+                        className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                        type="button"
+                      >
+                        <i className="fas fa-plus mr-1"></i> Tambah {tableTitle}
+                      </button>
+                    </Link>
+                  )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
         <div className="block w-full overflow-x-auto">
           {/* Projects table */}
@@ -101,7 +107,7 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                       key={idx}
                       className={
-                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left " +
                         (color === "light"
                           ? "bg-slate-50 text-slate-500 border-slate-100"
                           : "bg-slate-600 text-slate-200 border-slate-500")
@@ -149,7 +155,7 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
                     <tr
                       {...row.getRowProps()}
                       key={idx}
-                      className="mb-3 items-center rounded-lg bg-white uppercase shadow-card last:mb-0 "
+                      className="items-center rounded-lg bg-white uppercase shadow-card last:mb-0 "
                     >
                       {row.cells.map((cell, idx) => {
                         return (
@@ -169,20 +175,18 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
             ) : (
               <tbody
                 {...getTableBodyProps()}
-                className="text-xs font-medium text-zinc-900  3xl:text-sm "
+                className="text-xs font-medium text-zinc-900 3xl:text-sm"
               >
                 <tr
                   className={
-                    "mb-3 flex items-center justify-center uppercase shadow-card last:mb-0 k" +
+                    " items-center justify-center uppercase shadow-card" +
                     (color === "light"
                       ? "bg-slate-50 text-slate-500 border-slate-100"
                       : "bg-slate-600 text-slate-200 border-slate-500")
                   }
                 >
-                  <td className="py-4" colSpan={columns.length}>
-                    <div className="flex items-center justify-center gap-4 xs:items-center xs:gap-3 xl:gap-4">
-                      Data Not Found
-                    </div>
+                  <td colSpan={columns.length}>
+                    <div className="text-center py-4">Data Tidak Ditemukan</div>
                   </td>
                 </tr>
               </tbody>

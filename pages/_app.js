@@ -4,13 +4,11 @@ import Head from "next/head";
 import Router from "next/router";
 import { createRoot } from "react-dom/client";
 import PageChange from "components/PageChange/PageChange.js";
-
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "styles/tailwind.css";
+import toast, { Toaster } from "react-hot-toast";
 
 let root;
-
-
 
 export default class MyApp extends App {
   static async getInitialProps({ Component, router, ctx }) {
@@ -38,6 +36,7 @@ export default class MyApp extends App {
         </Head>
         <Layout>
           <Component {...pageProps} />
+          <Toaster />
         </Layout>
       </React.Fragment>
     );

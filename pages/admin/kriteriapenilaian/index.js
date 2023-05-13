@@ -1,41 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CardTable from "components/Cards/CardTable.js";
 import Admin from "layouts/Admin.js";
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 export default function KriteriaPenilaian() {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      nama_kriteria: "Rute 1",
-      kode_kriteria: "04 April 2023",
-      bobot: "3153 Kg",
-    },
-    {
-      id: 2,
-      nama_kriteria: "Rute 2",
-      kode_kriteria: "04 April 2023",
-      bobot: "1025 Kg",
-    },
-    {
-      id: 3,
-      nama_kriteria: "Rute 3",
-      kode_kriteria: "04 April 2023",
-      bobot: "2249 Kg",
-    },
-    {
-      id: 4,
-      nama_kriteria: "Rute 4",
-      kode_kriteria: "04 April 2023",
-      bobot: "390 Kg",
-    },
-    {
-      id: 5,
-      nama_kriteria: "Rute 5",
-      kode_kriteria: "04 April 2023",
-      bobot: "2760 Kg",
-    },
-  ]);
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const router = useRouter();
 
   const COLUMNS = [
     {
@@ -64,6 +39,41 @@ export default function KriteriaPenilaian() {
       disableSortBy: true,
     },
   ];
+
+  const token = Cookies.get("token");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        "http://localhost:3001/api/kriteriapenilaian/get",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        setData([]);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <>

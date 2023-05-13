@@ -1,68 +1,58 @@
 import React from "react";
 import { createPopper } from "@popperjs/core";
+import { Menu, Transition } from "@headlessui/react";
+import Cookies from "js-cookie";
+import { verify } from "jsonwebtoken";
+import { useRouter } from "next/router";
 
 const UserDropdown = () => {
-  // dropdown props
-  const [dropdownPopoverShow, setDropdownPopoverShow] = React.useState(false);
-  const btnDropdownRef = React.createRef();
-  const popoverDropdownRef = React.createRef();
-  const openDropdownPopover = () => {
-    createPopper(btnDropdownRef.current, popoverDropdownRef.current, {
-      placement: "bottom-start",
-    });
-    setDropdownPopoverShow(true);
-  };
-  const closeDropdownPopover = () => {
-    setDropdownPopoverShow(false);
+  const router = useRouter();
+  const email = Cookies.get("email");
+
+  const signOutUser = () => {
+    Cookies.remove("email");
+    Cookies.remove("token");
+    router.push("/");
   };
   return (
     <>
-      <a
-        className="text-slate-500 block"
-        href="#pablo"
-        ref={btnDropdownRef}
-        onClick={(e) => {
-          e.preventDefault();
-          dropdownPopoverShow ? closeDropdownPopover() : openDropdownPopover();
-        }}
-      >
-        <div className="items-center flex">
-          <span className="w-12 h-12 text-sm text-white bg-slate-200 inline-flex items-center justify-center rounded-full">
-            <img
-              alt="..."
-              className="w-full rounded-full align-middle border-none shadow-lg"
-              src="/img/avatar.png"
-            />
-          </span>
-        </div>
-      </a>
-      <div
-        ref={popoverDropdownRef}
-        className={
-          (dropdownPopoverShow ? "block " : "hidden ") +
-          "bg-white text-base z-50 float-left py-2 list-none text-left rounded shadow-lg min-w-48"
-        }
-      >
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-slate-700"
-          }
-          onClick={(e) => e.preventDefault()}
-        >
-          Profile
-        </a>
+      <div className="flex items-center justify-center p-12">
+        <div className="relative inline-block text-left">
+          <Menu>
+            <Menu.Button>
+              <img
+                alt="User Avatar"
+                className="w-12 h-12 rounded-full object-cover"
+                src="/img/avatar.png"
+              />
+            </Menu.Button>
+            <Menu.Items className="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none">
+              <div className="px-4 py-3">
+                <p className="text-sm leading-5">Signed in as</p>
+                <p className="text-sm font-medium leading-5 text-gray-900 truncate">
+                  {email}
+                </p>
+              </div>
 
-        <div className="h-0 my-2 border border-solid border-slate-100" />
-        <a
-          href="#pablo"
-          className={
-            "text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-slate-700 font-semibold"
-          }
-          onClick={(e) => e.preventDefault()}
-        >
-          Keluar
-        </a>
+              <div className="py-1">
+                <Menu.Item>
+                  {({ active }) => (
+                    <button
+                      onClick={() => {
+                        signOutUser();
+                      }}
+                      className={`${
+                        active ? "bg-gray-100 text-gray-900 " : "text-gray-700"
+                      } flex justify-between w-full px-4 py-2 text-sm leading-5 text-left`}
+                    >
+                      Sign Out
+                    </button>
+                  )}
+                </Menu.Item>
+              </div>
+            </Menu.Items>
+          </Menu>
+        </div>
       </div>
     </>
   );

@@ -1,51 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CardTable from "components/Cards/CardTable.js";
 import Admin from "layouts/Admin.js";
 import TableDropdown from "components/Dropdowns/TableDropdown.js";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
+import moment from "moment";
 
 export default function Datalist() {
-  const [data, setData] = useState([
-    {
-      id: 1,
-      nama_rute: "Rute 1",
-      tgl_pengiriman: "04 April 2023",
-      total_berat_paket: "3153 Kg",
-      tujuan: "Rute Kota Medan",
-      total_paket: "3036 Paket",
-    },
-    {
-      id: 2,
-      nama_rute: "Rute 2",
-      tgl_pengiriman: "04 April 2023",
-      total_berat_paket: "1025 Kg",
-      tujuan: "Rute Kabupaten Karo, dan Dairi",
-      total_paket: "483 Paket",
-    },
-    {
-      id: 3,
-      nama_rute: "Rute 3",
-      tgl_pengiriman: "04 April 2023",
-      total_berat_paket: "2249 Kg",
-      tujuan: "Rute Kisaran, Kualuh hulu, Lima Puluh, dan Lubuk Pakam",
-      total_paket: "599 Paket",
-    },
-    {
-      id: 4,
-      nama_rute: "Rute 4",
-      tgl_pengiriman: "04 April 2023",
-      total_berat_paket: "390 Kg",
-      tujuan: "Rute Babalan, Binjai, dan Kota Stabat",
-      total_paket: "812 Paket",
-    },
-    {
-      id: 5,
-      nama_rute: "Rute 5",
-      tgl_pengiriman: "04 April 2023",
-      total_berat_paket: "2760 Kg",
-      tujuan: "Rute Silangit, Simalungun, dan Kota Siantar",
-      total_paket: "1091 Paket",
-    },
-  ]);
+  const [data, setData] = useState([]);
+  const [isLoading, setLoading] = useState(false);
+  const router = useRouter();
 
   const COLUMNS = [
     {
@@ -56,9 +22,11 @@ export default function Datalist() {
     },
     {
       Header: () => <div>Tanggal Pengiriman</div>,
-      accessor: "tgl_pengiriman",
+      accessor: "tanggal_pengiriman",
       // @ts-ignore
-      Cell: ({ cell: { value } }) => <div>{value}</div>,
+      Cell: ({ cell: { value } }) => (
+        <div>{moment(value).format("DD MMMM YYYY")}</div>
+      ),
     },
     {
       Header: () => <div>Total Berat Paket</div>,
@@ -86,6 +54,38 @@ export default function Datalist() {
       disableSortBy: true,
     },
   ];
+
+  const token = Cookies.get("token");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:3001/api/data/get", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        setData([]);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <>

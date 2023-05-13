@@ -1,8 +1,16 @@
-import React from "react";
-
+import React, { useState } from "react";
 import Admin from "layouts/Admin.js";
+import Select from "react-select";
 
 export default function InputKriteriaPenilaian() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const onMenuOpen = () => setIsMenuOpen(true);
+  const onMenuClose = () => setIsMenuOpen(false);
+  const dataOptions = [
+    { value: "C1", label: "C1" },
+    { value: "C2", label: "C2" },
+    { value: "C3", label: "C3" },
+  ];
   return (
     <>
       <div className="flex flex-wrap">
@@ -75,10 +83,13 @@ export default function InputKriteriaPenilaian() {
                       <label className="block uppercase  text-xs font-bold mb-2">
                         Tujuan
                       </label>
-                      <input
-                        type="text"
-                        placeholder="Tujuan"
-                        className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                      <Select
+                        aria-labelledby="aria-label"
+                        inputId="aria-example-input"
+                        name="aria-live-color"
+                        onMenuOpen={onMenuOpen}
+                        onMenuClose={onMenuClose}
+                        options={dataOptions}
                       />
                     </div>
                   </div>

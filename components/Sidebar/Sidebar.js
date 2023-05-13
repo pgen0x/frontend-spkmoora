@@ -20,6 +20,12 @@ export default function Sidebar() {
           >
             <i className="fas fa-bars"></i>
           </button>
+          {/* User */}
+          <ul className="md:hidden items-center flex flex-wrap list-none justify-center">
+            <li className="inline-block relative">
+              <UserDropdown />
+            </li>
+          </ul>
           {/* Brand */}
           <Link href="/">
             <img
@@ -28,15 +34,7 @@ export default function Sidebar() {
               className="md:block text-left md:pb-2  mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
             />
           </Link>
-          {/* User */}
-          <ul className="md:hidden items-center flex flex-wrap list-none">
-            <li className="inline-block relative">
-              <NotificationDropdown />
-            </li>
-            <li className="inline-block relative">
-              <UserDropdown />
-            </li>
-          </ul>
+
           {/* Collapse */}
           <div
             className={
@@ -132,7 +130,7 @@ export default function Sidebar() {
                 >
                   <i
                     className={
-                      "fas fa-table mr-2 text-sm " +
+                      "fas fa-chart-pie mr-2 text-sm " +
                       (router.pathname.indexOf("/admin/kriteriapenilaian") !==
                       -1
                         ? "opacity-75"
