@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 // components
 
 import CardStats from "components/Cards/CardStats.js";
 
 export default function HeaderStats() {
+  const [totalData, setTotalData] = useState(0);
+  const [totalJenisKendaraan, setTotalJenisKendaraan] = useState(0);
+  const [totalKriteria, setTotalKriteria] = useState(0);
+  const [totalPerhitungan, setTotalPerhitungan] = useState(0);
+
   return (
     <>
       {/* Header */}
@@ -16,7 +21,7 @@ export default function HeaderStats() {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="TOTAL DATA"
-                  statTitle="350,897"
+                  statTitle={totalData}
                   statIconName="far fa-chart-bar"
                   statIconColor="bg-red-500"
                 />
@@ -24,7 +29,7 @@ export default function HeaderStats() {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="TOTAL JENIS KENDARAAN"
-                  statTitle="2,356"
+                  statTitle={totalJenisKendaraan}
                   statIconName="fas fa-truck"
                   statIconColor="bg-orange-500"
                 />
@@ -32,7 +37,7 @@ export default function HeaderStats() {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="TOTAL KRITERIA"
-                  statTitle="924"
+                  statTitle={totalKriteria}
                   statIconName="fas fa-chart-pie"
                   statIconColor="bg-pink-500"
                 />
@@ -40,7 +45,7 @@ export default function HeaderStats() {
               <div className="w-full lg:w-6/12 xl:w-3/12 px-4">
                 <CardStats
                   statSubtitle="TOTAL PERHITUNGAN"
-                  statTitle="49,65%"
+                  statTitle={totalPerhitungan}
                   statIconName="fas fa-percent"
                   statIconColor="bg-sky-500"
                 />

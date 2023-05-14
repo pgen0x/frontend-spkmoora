@@ -1,5 +1,5 @@
 import React from "react";
-
+import Link from "next/link";
 import Admin from "layouts/Admin.js";
 
 export default function InputJenisKendaraan() {
@@ -18,16 +18,16 @@ export default function InputJenisKendaraan() {
                     className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
                   >
-                    Simpan
+                    <i className="fas fa-save mr-2"></i>Simpan
                   </button>
-                  <a href="/admin/jeniskendaraan">
+                  <Link href="/admin/jeniskendaraan">
                     <button
                       className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                       type="button"
                     >
-                      Batal
+                      <i className="fas fa-arrow-left mr-2"></i>Kembali
                     </button>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

@@ -85,7 +85,17 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
                         className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                         type="button"
                       >
-                        <i className="fas fa-plus mr-1"></i> Tambah {tableTitle}
+                        {tableTitle === "Riwayat Perhitungan" ? (
+                          <>
+                            <i className="fas fa-file-export mr-1"></i> Export{" "}
+                            {tableTitle}
+                          </>
+                        ) : (
+                          <>
+                            <i className="fas fa-plus mr-1"></i> Tambah{" "}
+                            {tableTitle}
+                          </>
+                        )}
                       </button>
                     </Link>
                   )}

@@ -14,13 +14,16 @@ export default function Navbar() {
     "/admin/inputdata": "Tambah Data",
     "/admin/kriteriapenilaian": "Kriteria Penilaian",
     "/admin/inputkriteriapenilaian": "Tambah Kriteria Penilaian",
-    "/admin/bobotkriteria": "bobot kriteria",
+    "/admin/bobotkriteria": "Bobot Kriteria",
     "/admin/inputbobotkriteria": "Tambah bobot kriteria",
-    "/admin/aturanpenilaian": "aturan penilaian",
+    "/admin/aturanpenilaian": "Aturan Penilaian",
     "/admin/inputaturanpenilaian": "Tambah aturan penilaian",
-    "/admin/jeniskendaraan": "jenis kendaraan",
+    "/admin/jeniskendaraan": "Jenis Kendaraan",
     "/admin/inputjeniskendaraan": "Tambah jenis kendaraan",
-    "/admin/perhitungan": "Perhitungan",
+    "/admin/perhitungan/proses": "Proses Perhitungan",
+    "/admin/perhitungan/riwayat": "Riwayat Perhitungan",
+
+    "/admin/profile": "Profile",
 
     // add more routes and titles as needed
   };
@@ -31,10 +34,10 @@ export default function Navbar() {
     <>
       {/* Navbar */}
       <nav className="absolute top-0 left-0 w-full z-10 bg-transparent md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
-        <div className="w-full mx-auto items-center flex justify-between lg:justify-end md:flex-nowrap flex-wrap md:px-10 px-4">
+        <div className="w-full mx-aut0 items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
           {/* Brand */}
           <a
-            className="text-white text-sm uppercase hidden lg:inline-block font-semibold"
+            className="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3 text-white"
             href="/admin/dashboard"
             onClick={(e) => e.preventDefault()}
           >

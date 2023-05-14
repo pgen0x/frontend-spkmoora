@@ -1,19 +1,85 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import Admin from "layouts/Admin.js";
-import Select, { AriaOnFocus } from "react-select";
+import Select from "react-select";
+import { useForm, Controller } from "react-hook-form";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function InputBobotKriteria() {
   const [ariaFocusMessage, setAriaFocusMessage] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const onMenuOpen = () => setIsMenuOpen(true);
   const onMenuClose = () => setIsMenuOpen(false);
+  const [showMinMax, setShowMinMax] = useState(false);
+  const [selectedKriteria, setSelectedKriteria] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  const dataOptions = [
-    { value: "C1", label: "C1" },
-    { value: "C2", label: "C2" },
-    { value: "C3", label: "C3" },
-  ];
+  const token = Cookies.get("token");
+  const router = useRouter();
+  const {
+    formState: { errors },
+    register,
+    handleSubmit,
+    control,
+    reset,
+    setValue,
+  } = useForm();
+
+  useEffect(() => {
+    async function fetchKriteriaOptions() {
+      try {
+        const response = await axios.get(
+          "http://localhost:3001/api/kriteriapenilaian/get",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const kriteriaData = response.data.map((item) => ({
+          value: item.id,
+          label: item.kode_kriteria,
+          data: item,
+        }));
+
+        setSelectedOption(kriteriaData);
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          // If token is expired, log out the user or refresh the token
+          Cookies.remove("token");
+          toast.error("Token kedaluwarsa. Silahkan login kembali");
+          router.push("/");
+        } else {
+          toast.error(error.message);
+
+          console.error(error);
+        }
+      }
+    }
+    fetchKriteriaOptions();
+  }, []);
+
+  useEffect(() => {
+    if (selectedKriteria) {
+      const namaKriteria = selectedKriteria.nama_kriteria;
+      // update value dari input nama kriteria
+      setValue("nama_kriteria", namaKriteria);
+    } else {
+      setValue("nama_kriteria", "");
+    }
+  }, [selectedKriteria]);
+
+  const handleCheckboxChange = (event) => {
+    setShowMinMax(event.target.checked);
+  };
+
+  function handleSelectChange(selectedOption) {
+    setSelectedKriteria(selectedOption?.data); // simpan data kriteria yang dipilih ke state
+  }
 
   return (
     <>
@@ -30,16 +96,16 @@ export default function InputBobotKriteria() {
                     className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                     type="button"
                   >
-                    Simpan
+                    <i className="fas fa-save mr-2"></i>Simpan
                   </button>
-                  <a href="/admin/bobotkriteria">
+                  <Link href="/admin/bobotkriteria">
                     <button
                       className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                       type="button"
                     >
-                      Batal
+                      <i className="fas fa-arrow-left mr-2"></i>Kembali
                     </button>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -51,13 +117,19 @@ export default function InputBobotKriteria() {
                       <label className="block uppercase  text-xs font-bold mb-2">
                         Kode Kriteria
                       </label>
-                      <Select
-                        aria-labelledby="aria-label"
-                        inputId="aria-example-input"
-                        name="aria-live-color"
-                        onMenuOpen={onMenuOpen}
-                        onMenuClose={onMenuClose}
-                        options={dataOptions}
+                      <Controller
+                        name="kode_kriteria"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            options={selectedOption}
+                            placeholder="Pilih Kode Kriteria"
+                            isClearable
+                            onChange={handleSelectChange}
+                          />
+                        )}
                       />
                     </div>
                   </div>
@@ -70,22 +142,73 @@ export default function InputBobotKriteria() {
                         type="text"
                         placeholder="Nama Kriteria"
                         disabled
-                        className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150  disabled:opacity-25 cursor-not-allowed"
+                        {...register("nama_kriteria")}
+                        className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150 cursor-not-allowed"
                       />
                     </div>
                   </div>
                   <div className="w-full px-4">
-                    <div className="relative w-full mb-3">
-                      <label className="block uppercase  text-xs font-bold mb-2">
-                        Nilai
-                      </label>
+                    <div className="flex items-center mb-3">
                       <input
-                        type="text"
-                        placeholder="Nilai"
-                        className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        id="bordered-radio-1"
+                        type="checkbox"
+                        value=""
+                        name="bordered-radio"
+                        onChange={handleCheckboxChange}
+                        className="w-4 h-4 text-red-500 bg-gray-100 border-gray-300 focus:ring-red-500 dark:focus:ring-red-500"
                       />
+                      <label
+                        htmlFor="bordered-radio-1"
+                        className="w-full py-4 ml-2 text-sm font-medium "
+                      >
+                        Apakah ada nilai minimum dan maximum / range ?
+                      </label>
                     </div>
                   </div>
+                  {showMinMax && (
+                    <>
+                      <div className="w-full px-4">
+                        <div className="relative w-full mb-3">
+                          <label className="block uppercase  text-xs font-bold mb-2">
+                            Minimum Nilai
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Minimum Nilai"
+                            className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          />
+                        </div>
+                      </div>
+                      <div className="w-full px-4">
+                        <div className="relative w-full mb-3">
+                          <label className="block uppercase  text-xs font-bold mb-2">
+                            Maximum Nilai
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Maximum Nilai"
+                            className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {!showMinMax && (
+                    <>
+                      <div className="w-full px-4">
+                        <div className="relative w-full mb-3">
+                          <label className="block uppercase  text-xs font-bold mb-2">
+                            Nilai
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Nilai"
+                            className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                   <div className="w-full px-4">
                     <div className="relative w-full mb-3">
                       <label className="block uppercase  text-xs font-bold mb-2">

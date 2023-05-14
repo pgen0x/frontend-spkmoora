@@ -13,7 +13,9 @@ export default function Perhitungan() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const onMenuOpen = () => setIsMenuOpen(true);
   const onMenuClose = () => setIsMenuOpen(false);
+  const [isHitung, setHitung] = useState(false);
   const [isLoading, setLoading] = useState(false);
+
   const [selectedOption, setSelectedOption] = useState(null);
   const [dataPenilaianAlternatif, setDataPenilaianAlternatif] = useState([]);
   const [dataPenilaianYi, setDataPenilaianYi] = useState([]);
@@ -78,7 +80,6 @@ export default function Perhitungan() {
       return;
     }
     try {
-      setLoading(true);
       const response = await axios.post(
         "http://localhost:3001/api/perhitungan/hitung",
         {
@@ -95,10 +96,41 @@ export default function Perhitungan() {
       setDataPenilaianYi(response.data.nilai_yi);
       setDataHasilPenilaian(response.data.hasil_penilaian);
       console.log(response.data);
-      setLoading(false);
+      setHitung(true);
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        setLoading(false);
+        setHitung(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  }
+
+  async function Simpan() {
+    if (!hasilPenilaian) {
+      toast.error("Silahkan melakukan perhitungan dahulu");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/perhitungan/simpan",
+        hasilPenilaian,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response);
+      toast.success("Data perhitungan berhasil di simpan");
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
         // If token is expired, log out the user or refresh the token
         Cookies.remove("token");
         toast.error("Token kedaluwarsa. Silahkan login kembali");
@@ -144,7 +176,7 @@ export default function Perhitungan() {
   const COLUMNSPenilaianYi = React.useMemo(() => [
     {
       Header: "Alternatif",
-      accessor: "alternatif",
+      accessor: "nama_rute",
     },
     {
       Header: "Tanggal Pengiriman",
@@ -169,7 +201,7 @@ export default function Perhitungan() {
   const COLUMNSHasilPenilaian = React.useMemo(() => [
     {
       Header: "Alternatif",
-      accessor: "alternatif",
+      accessor: "nama_rute",
     },
     {
       Header: "Tanggal Pengiriman",
@@ -196,7 +228,7 @@ export default function Perhitungan() {
     },
     {
       Header: "Jenis Kendaraan",
-      accessor: "jenis_kendaraan",
+      accessor: "jenisKendaraanId.jenis_kendaraan",
     },
   ]);
 
@@ -220,9 +252,12 @@ export default function Perhitungan() {
                   </button>
 
                   <button
-                    className="group bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150 disabled:opacity-50 cursor-not-allowed"
+                    className={`bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150 ${
+                      isHitung ? "" : "disabled:opacity-50 cursor-not-allowed"
+                    }`}
                     type="button"
-                    disabled={true}
+                    disabled={isHitung ? false : true}
+                    onClick={Simpan}
                   >
                     <i className="fas fa-save mr-1"></i>Simpan Perhitungan
                   </button>

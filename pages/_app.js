@@ -1,14 +1,10 @@
 import React from "react";
 import App from "next/app";
 import Head from "next/head";
-import Router from "next/router";
-import { createRoot } from "react-dom/client";
-import PageChange from "components/PageChange/PageChange.js";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "styles/tailwind.css";
-import toast, { Toaster } from "react-hot-toast";
-
-let root;
+import { Toaster } from "react-hot-toast";
+import NextNProgress from "nextjs-progressbar";
 
 export default class MyApp extends App {
   static async getInitialProps({ Component, router, ctx }) {
@@ -34,7 +30,9 @@ export default class MyApp extends App {
           />
           <title>SPK - ID Express Logistik</title>
         </Head>
+
         <Layout>
+          <NextNProgress color="rgb(240 68 68)" />
           <Component {...pageProps} />
           <Toaster />
         </Layout>

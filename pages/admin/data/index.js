@@ -32,7 +32,7 @@ export default function Datalist() {
       Header: () => <div>Total Berat Paket</div>,
       accessor: "total_berat_paket",
       // @ts-ignore
-      Cell: ({ cell: { value } }) => <div>{value}</div>,
+      Cell: ({ cell: { value } }) => <div>{value} kg</div>,
     },
     {
       Header: () => <div>tujuan</div>,
@@ -44,7 +44,7 @@ export default function Datalist() {
       Header: () => <div>Total Paket</div>,
       accessor: "total_paket",
       // @ts-ignore
-      Cell: ({ cell: { value } }) => <div>{value}</div>,
+      Cell: ({ cell: { value } }) => <div>{value} paket</div>,
     },
     {
       Header: () => <div></div>,
@@ -91,11 +91,7 @@ export default function Datalist() {
     <>
       <div className="flex flex-wrap mt-4">
         <div className="w-full mb-12 px-4">
-          <CardTable
-            tableTitle="Data"
-            COLUMNS={COLUMNS}
-            dataTable={data}
-          />
+          <CardTable tableTitle="Data" COLUMNS={COLUMNS} dataTable={data} />
         </div>
       </div>
     </>

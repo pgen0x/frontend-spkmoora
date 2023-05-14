@@ -20,20 +20,21 @@ export default function Sidebar() {
           >
             <i className="fas fa-bars"></i>
           </button>
+
+          {/* Brand */}
+          <Link href="/admin/dashboard">
+            <img
+              href="#pablo"
+              src="/img/id-express.png"
+              className="md:block hidden text-left md:pb-2  mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
+            />
+          </Link>
           {/* User */}
           <ul className="md:hidden items-center flex flex-wrap list-none justify-center">
             <li className="inline-block relative">
               <UserDropdown />
             </li>
           </ul>
-          {/* Brand */}
-          <Link href="/">
-            <img
-              href="#pablo"
-              src="/img/id-express.png"
-              className="md:block text-left md:pb-2  mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0"
-            />
-          </Link>
 
           {/* Collapse */}
           <div
@@ -95,7 +96,6 @@ export default function Sidebar() {
                   Dashboard
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
                   href="/admin/data"
@@ -117,7 +117,6 @@ export default function Sidebar() {
                   Data
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
                   href="/admin/kriteriapenilaian"
@@ -140,7 +139,6 @@ export default function Sidebar() {
                   Kriteria Penilaian
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
                   href="/admin/bobotkriteria"
@@ -162,7 +160,6 @@ export default function Sidebar() {
                   Bobot Kriteria
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
                   href="/admin/aturanpenilaian"
@@ -184,7 +181,6 @@ export default function Sidebar() {
                   Aturan Penilaian
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
                   href="/admin/jeniskendaraan"
@@ -206,13 +202,12 @@ export default function Sidebar() {
                   Jenis Kendaraan
                 </Link>
               </li>
-
               <li className="items-center">
                 <Link
-                  href="/admin/perhitungan"
+                  href="/admin/perhitungan/proses"
                   className={
                     "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/admin/perhitungan") !== -1
+                    (router.pathname.indexOf("/admin/perhitungan/proses") !== -1
                       ? "text-red-500 hover:text-red-600"
                       : "text-slate-700 hover:text-slate-500")
                   }
@@ -220,12 +215,36 @@ export default function Sidebar() {
                   <i
                     className={
                       "fas fa-percent mr-2 text-sm " +
-                      (router.pathname.indexOf("/admin/perhitungan") !== -1
+                      (router.pathname.indexOf("/admin/perhitungan/proses") !==
+                      -1
                         ? "opacity-75"
                         : "text-slate-300")
                     }
                   ></i>{" "}
                   Perhitungan
+                </Link>
+              </li>
+              <li className="items-center">
+                <Link
+                  href="/admin/perhitungan/riwayat"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/perhitungan/riwayat") !==
+                    -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
+                    className={
+                      "fas fa-file mr-2 text-sm " +
+                      (router.pathname.indexOf("/admin/perhitungan/riwayat") !==
+                      -1
+                        ? "opacity-75"
+                        : "text-slate-300")
+                    }
+                  ></i>{" "}
+                  Riwayat Perhitungan
                 </Link>
               </li>
             </ul>

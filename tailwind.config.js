@@ -4,10 +4,10 @@ const colors = require("tailwindcss/colors");
 module.exports = {
   content: ["./**/*.html", "./*.html", "./**/*.js", "./*.js"],
   theme: {
-    colors: {
-      ...colors,
-    },
     extend: {
+      colors: {
+        ...colors,
+      },
       minHeight: {
         "screen-75": "75vh",
       },

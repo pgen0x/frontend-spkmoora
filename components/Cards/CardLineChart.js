@@ -1,8 +1,84 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Chart from "chart.js";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
+import moment from "moment";
 
 export default function CardLineChart() {
-  React.useEffect(() => {
+  const [data2022, setData2022] = useState(new Array(12).fill(0));
+  const [data2023, setData2023] = useState(new Array(12).fill(0));
+  const [isLoading, setLoading] = useState(false);
+  const router = useRouter();
+  const token = Cookies.get("token");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:3001/api/data/get", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+
+      setLoading(false);
+      const countByMonth = {};
+
+      for (const d of response.data) {
+        const date = new Date(d.tanggal_pengiriman);
+        const month = date.getMonth() + 1; // getMonth() returns 0-based month
+        const year = date.getFullYear();
+        const key = year + "-" + month.toString().padStart(2, "0"); // e.g. "2023-04"
+
+        if (countByMonth[key]) {
+          countByMonth[key]++;
+        } else {
+          countByMonth[key] = 1;
+        }
+      }
+
+      // Loop through the raw data and populate the data arrays
+      for (const key in countByMonth) {
+        const year = key.substring(0, 4);
+        const month = parseInt(key.substring(5)) - 1;
+        const count = countByMonth[key];
+
+        if (year === "2022") {
+          setData2022((prevData) => {
+            const newData = [...prevData];
+            newData[month] = count;
+            return newData;
+          });
+        } else if (year === "2023") {
+          setData2023((prevData) => {
+            const newData = [...prevData];
+            newData[month] = count;
+            return newData;
+          });
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     var config = {
       type: "line",
       data: {
@@ -14,13 +90,18 @@ export default function CardLineChart() {
           "May",
           "June",
           "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
         ],
         datasets: [
           {
             label: new Date().getFullYear(),
             backgroundColor: "#4c51bf",
             borderColor: "#4c51bf",
-            data: [65, 78, 66, 44, 56, 67, 75],
+            data: data2023,
             fill: false,
           },
           {
@@ -28,7 +109,7 @@ export default function CardLineChart() {
             fill: false,
             backgroundColor: "#fff",
             borderColor: "#fff",
-            data: [40, 68, 86, 74, 56, 60, 87],
+            data: data2022,
           },
         ],
       },
@@ -105,7 +186,7 @@ export default function CardLineChart() {
     };
     var ctx = document.getElementById("line-chart").getContext("2d");
     window.myLine = new Chart(ctx, config);
-  }, []);
+  }, [data2022, data2023]);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded bg-slate-700">

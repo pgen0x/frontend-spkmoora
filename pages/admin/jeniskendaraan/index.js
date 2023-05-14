@@ -23,7 +23,7 @@ export default function KriteriaPenilaian() {
       Header: () => <div>Kapasitas Muatan</div>,
       accessor: "kapasitas_muatan",
       // @ts-ignore
-      Cell: ({ cell: { value } }) => <div>{value}</div>,
+      Cell: ({ cell: { value } }) => <div>{value} kg</div>,
     },
     {
       Header: () => <div></div>,

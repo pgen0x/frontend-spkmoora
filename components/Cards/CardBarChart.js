@@ -1,8 +1,71 @@
-import React from "react";
-import Chart from "chart.js";
+import React, { useState, useEffect } from "react";
+import Chart, { Utils } from "chart.js";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useRouter } from "next/router";
+import toast from "react-hot-toast";
+import moment from "moment";
 
 export default function CardBarChart() {
-  React.useEffect(() => {
+  const [data2022, setData2022] = useState(new Array(12).fill(0));
+  const [data2023, setData2023] = useState(new Array(12).fill(0));
+  const [isLoading, setLoading] = useState(false);
+  const router = useRouter();
+  const token = Cookies.get("token");
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:3001/api/data/get", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+
+      setLoading(false);
+      const countByMonth2022 = new Array(12).fill(0);
+      const countByMonth2023 = new Array(12).fill(0);
+
+      for (const d of response.data) {
+        const date = new Date(d.tanggal_pengiriman);
+        const month = date.getMonth(); // getMonth() returns 0-based month
+        const year = date.getFullYear();
+
+        if (year === 2022) {
+          countByMonth2022[month] += d.total_paket;
+        } else if (year === 2023) {
+          countByMonth2023[month] += d.total_paket;
+        }
+      }
+
+      const totalByMonth2022 = countByMonth2022.reduce((a, b) => a + b, 0);
+      const totalByMonth2023 = countByMonth2023.reduce((a, b) => a + b, 0);
+
+      console.log("Total paket in 2022:", totalByMonth2022);
+      console.log("Total paket in 2023:", totalByMonth2023);
+
+      setData2022(countByMonth2022);
+      setData2023(countByMonth2023);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     let config = {
       type: "bar",
       data: {
@@ -14,23 +77,26 @@ export default function CardBarChart() {
           "May",
           "June",
           "July",
+          "August",
+          "September",
+          "October",
+          "November",
+          "December",
         ],
         datasets: [
           {
             label: new Date().getFullYear(),
             backgroundColor: "#ed64a6",
             borderColor: "#ed64a6",
-            data: [30, 78, 0, 0, 0, 0, 0],
+            data: data2023,
             fill: false,
-            barThickness: 8,
           },
           {
             label: new Date().getFullYear() - 1,
             fill: false,
             backgroundColor: "#4c51bf",
             borderColor: "#4c51bf",
-            data: [27, 68, 0, 0, 0, 0, 0],
-            barThickness: 8,
+            data: data2022,
           },
         ],
       },
@@ -97,7 +163,7 @@ export default function CardBarChart() {
     };
     let ctx = document.getElementById("bar-chart").getContext("2d");
     window.myBar = new Chart(ctx, config);
-  }, []);
+  }, [data2022, data2023]);
   return (
     <>
       <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded">
