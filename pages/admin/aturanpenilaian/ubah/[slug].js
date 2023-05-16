@@ -8,11 +8,35 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-export default function InputJenisKendaraan() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const onMenuOpen = () => setIsMenuOpen(true);
-  const onMenuClose = () => setIsMenuOpen(false);
-  const [tujuanOptions, setTujuanOptions] = useState([]);
+export default function UbahAturanPenilaian() {
+  const [isLoading, setLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState([
+    {
+      value: ">=",
+      label: ">=",
+    },
+    {
+      value: ">",
+      label: ">",
+    },
+    {
+      value: "<",
+      label: "<",
+    },
+    {
+      value: "<=",
+      label: "<=",
+    },
+    {
+      value: "==",
+      label: "==",
+    },
+    {
+      value: "!=",
+      label: "!=",
+    },
+  ]);
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const token = Cookies.get("token");
   const router = useRouter();
@@ -22,14 +46,17 @@ export default function InputJenisKendaraan() {
     handleSubmit,
     control,
     reset,
+    setValue,
   } = useForm();
+
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/jeniskendaraan/create",
+      const response = await axios.put(
+        `http://localhost:3001/api/aturanpenilaian/update/${router.query.slug}`,
         {
-          jenis_kendaraan: data?.jenis_kendaraan,
-          kapasitas_muatan: data?.kapasitas_muatan,
+          keterangan: data?.keterangan,
+          nilai: data?.nilai,
+          descnilai: selectedValue.value,
         },
         {
           headers: {
@@ -38,15 +65,55 @@ export default function InputJenisKendaraan() {
           },
         }
       );
-      console.log("Response:", response.data);
-      toast.success("Jenis kendaraan berhasil ditambahkan");
+      toast.success(response.data.success.messages);
+      router.push("/admin/aturanpenilaian");
       // Reset form after successful submission
       reset();
     } catch (error) {
+      router.push("/");
       toast.error(error.message);
       console.error("Error:", error);
     }
   };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/aturanpenilaian/getbyid/${router.query.slug}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setValue("keterangan", response.data.keterangan);
+      setValue("descnilai", response.data.descnilai);
+      setValue("nilai", response.data.nilai);
+      const defaultValue = {
+        value: response.data.descnilai,
+        label: response.data.descnilai,
+      };
+      setSelectedValue(defaultValue);
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <>
       <div className="flex flex-wrap">
@@ -55,17 +122,17 @@ export default function InputJenisKendaraan() {
             <div className="rounded-t bg-white mb-0 px-6 py-6">
               <div className="text-center flex justify-between">
                 <h6 className="text-slate-700 text-xl font-bold">
-                  Tambah Jenis Kendaraan
+                  Ubah Aturan Penilaian
                 </h6>
                 <div>
                   <button
                     className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                    onClick={() => handleSubmit(onSubmit)()}
                     type="button"
+                    onClick={() => handleSubmit(onSubmit)()}
                   >
                     <i className="fas fa-save mr-2"></i>Simpan
                   </button>
-                  <Link href="/admin/jeniskendaraan">
+                  <Link href="/admin/aturanpenilaian">
                     <button
                       className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
                       type="button"
@@ -82,17 +149,17 @@ export default function InputJenisKendaraan() {
                   <div className="w-full  px-4">
                     <div className="relative w-full mb-3">
                       <label className="block uppercase  text-xs font-bold mb-2">
-                        Jenis Kendaran
+                        Keterangan
                       </label>
                       <input
                         type="text"
-                        {...register("jenis_kendaraan", { required: true })}
-                        placeholder="Jenis Kendaraan"
+                        placeholder="Keterangan"
                         className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        {...register("keterangan", { required: true })}
                       />
-                      {errors?.jenis_kendaraan && (
+                      {errors?.keterangan && (
                         <span className="mt-1 text-xs italic text-red-500">
-                          {errors.jenis_kendaraan.message}
+                          {errors.keterangan.message}
                         </span>
                       )}
                     </div>
@@ -100,17 +167,43 @@ export default function InputJenisKendaraan() {
                   <div className="w-full px-4">
                     <div className="relative w-full mb-3">
                       <label className="block uppercase  text-xs font-bold mb-2">
-                        Kapasitas Muatan
+                        Aturan
+                      </label>
+                      <Controller
+                        name="descnilai"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            instanceId="select-kode-kriteria"
+                            options={selectedOption}
+                            placeholder="Pilih Aturan Logika"
+                            value={selectedValue}
+                            onChange={setSelectedValue}
+                          />
+                        )}
+                      />
+                      {errors?.descnilai && (
+                        <span className="mt-1 text-xs italic text-red-500">
+                          {errors.descnilai.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-full px-4">
+                    <div className="relative w-full mb-3">
+                      <label className="block uppercase  text-xs font-bold mb-2">
+                        Nilai
                       </label>
                       <input
-                        type="text"
-                        {...register("kapasitas_muatan", { required: true })}
-                        placeholder="Kapasitas Muatan"
+                        type="number"
+                        placeholder="Nilai"
                         className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        {...register("nilai", { required: true })}
                       />
-                      {errors?.kapasitas_muatan && (
+                      {errors?.nilai && (
                         <span className="mt-1 text-xs italic text-red-500">
-                          {errors.kapasitas_muatan.message}
+                          {errors.nilai.message}
                         </span>
                       )}
                     </div>
@@ -125,4 +218,4 @@ export default function InputJenisKendaraan() {
   );
 }
 
-InputJenisKendaraan.layout = Admin;
+UbahAturanPenilaian.layout = Admin;

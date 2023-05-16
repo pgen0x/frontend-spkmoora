@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { createPopper } from "@popperjs/core";
 import { Menu, Transition } from "@headlessui/react";
 import Cookies from "js-cookie";
@@ -8,13 +8,27 @@ import Link from "next/link";
 
 const UserDropdown = ({ isMobile }) => {
   const router = useRouter();
-  const email = Cookies.get("email");
+  const [email, setEmail] = useState(Cookies.get("email"));
+
+  useEffect(() => {
+    const handleEmailUpdated = (event) => {
+      const updatedEmail = event.detail.email;
+      setEmail(updatedEmail);
+    };
+
+    document.addEventListener("emailUpdated", handleEmailUpdated);
+
+    return () => {
+      document.removeEventListener("emailUpdated", handleEmailUpdated);
+    };
+  }, []);
 
   const signOutUser = () => {
     Cookies.remove("email");
     Cookies.remove("token");
     router.push("/");
   };
+
   return (
     <>
       <div className="relative flex w-full flex-wrap items-stretch">
@@ -22,8 +36,8 @@ const UserDropdown = ({ isMobile }) => {
           <Menu.Button>
             <img
               alt="User Avatar"
-              className="w-12 h-12 rounded-full object-cover"
-              src="/img/avatar.png"
+              className="w-12 h-12 rounded-full object-cover border-2 border-white"
+              src="/img/avatar.jpg"
             />
           </Menu.Button>
           <Menu.Items className="absolute right-0 w-56 mt-16 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none">

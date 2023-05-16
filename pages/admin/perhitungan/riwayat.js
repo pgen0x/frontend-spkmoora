@@ -22,6 +22,14 @@ export default function RiwayatPerhitungan() {
 
   const COLUMNS = [
     {
+      Header: () => <div>Tanggal Disimpan</div>,
+      accessor: "createdAt",
+      // @ts-ignore
+      Cell: ({ cell: { value } }) => (
+        <div>{moment(value).format("DD MMMM YYYY HH:mm:ss")}</div>
+      ),
+    },
+    {
       Header: () => <div>Nama Rute</div>,
       accessor: "nama_rute",
       // @ts-ignore
@@ -57,7 +65,7 @@ export default function RiwayatPerhitungan() {
       Header: () => <div>Nilai Yi</div>,
       accessor: "yi",
       // @ts-ignore
-      Cell: ({ cell: { value } }) => <div>{value} paket</div>,
+      Cell: ({ cell: { value } }) => <div>{value}</div>,
     },
     {
       Header: "Keterangan",
@@ -90,6 +98,7 @@ export default function RiwayatPerhitungan() {
           },
         }
       );
+
       setData(response.data);
       const uniqueDates = new Set(
         response.data.map((item) => item.tanggal_pengiriman.slice(0, 10))
@@ -133,6 +142,7 @@ export default function RiwayatPerhitungan() {
     );
 
     // Set the filtered data to the data state
+    console.log(filteredData);
     setFilteredData(filteredData);
   };
 
@@ -166,7 +176,7 @@ export default function RiwayatPerhitungan() {
                         Pilih Data Berdasarkan Tanggal
                       </label>
                       <Select
-                        instanceId="select-data-date"
+                        instanceId="select-data-riwayat"
                         onMenuOpen={onMenuOpen}
                         onMenuClose={onMenuClose}
                         options={dataOptions}

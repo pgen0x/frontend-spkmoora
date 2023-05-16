@@ -13,7 +13,32 @@ export default function InputAturanPenilaian() {
   const onMenuOpen = () => setIsMenuOpen(true);
   const onMenuClose = () => setIsMenuOpen(false);
   const [tujuanOptions, setTujuanOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState([
+    {
+      value: ">=",
+      label: ">=",
+    },
+    {
+      value: ">",
+      label: ">",
+    },
+    {
+      value: "<",
+      label: "<",
+    },
+    {
+      value: "<=",
+      label: "<=",
+    },
+    {
+      value: "==",
+      label: "==",
+    },
+    {
+      value: "!=",
+      label: "!=",
+    },
+  ]);
   const token = Cookies.get("token");
   const router = useRouter();
   const {
@@ -30,6 +55,7 @@ export default function InputAturanPenilaian() {
         {
           keterangan: data?.keterangan,
           nilai: data?.nilai,
+          descnilai: data?.descnilai.value,
         },
         {
           headers: {
@@ -43,6 +69,7 @@ export default function InputAturanPenilaian() {
       // Reset form after successful submission
       reset();
     } catch (error) {
+      router.push("/");
       toast.error(error.message);
       console.error("Error:", error);
     }
@@ -93,6 +120,32 @@ export default function InputAturanPenilaian() {
                       {errors?.keterangan && (
                         <span className="mt-1 text-xs italic text-red-500">
                           {errors.keterangan.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-full px-4">
+                    <div className="relative w-full mb-3">
+                      <label className="block uppercase  text-xs font-bold mb-2">
+                        Aturan
+                      </label>
+                      <Controller
+                        name="descnilai"
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            instanceId="select-kode-kriteria"
+                            options={selectedOption}
+                            placeholder="Pilih Aturan Logika"
+                            isClearable
+                          />
+                        )}
+                      />
+                      {errors?.descnilai && (
+                        <span className="mt-1 text-xs italic text-red-500">
+                          {errors.descnilai.message}
                         </span>
                       )}
                     </div>

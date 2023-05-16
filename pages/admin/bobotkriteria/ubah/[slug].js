@@ -8,14 +8,11 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-export default function InputBobotKriteria() {
-  const [ariaFocusMessage, setAriaFocusMessage] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const onMenuOpen = () => setIsMenuOpen(true);
-  const onMenuClose = () => setIsMenuOpen(false);
-  const [showMinMax, setShowMinMax] = useState(false);
+export default function UbahBobotKriteria() {
+  const [showMinMax, setShowMinMax] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
-
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [isLoading, setLoading] = useState(false);
   const token = Cookies.get("token");
   const router = useRouter();
   const {
@@ -23,7 +20,6 @@ export default function InputBobotKriteria() {
     register,
     handleSubmit,
     control,
-    reset,
     setValue,
   } = useForm();
 
@@ -73,13 +69,13 @@ export default function InputBobotKriteria() {
   };
 
   const onSubmit = async (data) => {
-    console.log(data);
+    console.log(selectedValue);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/bobotkriteria/create",
+      const response = await axios.put(
+        `http://localhost:3001/api/bobotkriteria/update/${router.query.slug}`,
         {
-          kriteriaPenilaianId: data.kode_kriteria.value,
+          kriteriaPenilaianId: selectedValue.value,
           nilai: !showMinMax ? data.nilai : "",
           isMinMax: showMinMax,
           min_nilai: showMinMax ? data.min_nilai : "",
@@ -94,15 +90,54 @@ export default function InputBobotKriteria() {
         }
       );
       console.log("Response:", response.data);
-      toast.success("Data berhasil ditambahkan");
-      // Reset form after successful submission
-      reset();
-      setValue("kode_kriteria", "");
+      toast.success(response.data.success.messages);
+      router.push("/admin/bobotkriteria");
     } catch (error) {
       toast.error(error.message);
       console.error("Error:", error);
     }
   };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/bobotkriteria/getbyid/${router.query.slug}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(showMinMax);
+      setShowMinMax(response.data.isMinMax);
+      const defaultValue = {
+        value: response.data.kriteriaPenilaianId,
+        label: `${response.data.kriteria_penilaian.kode_kriteria} - ${response.data.kriteria_penilaian.nama_kriteria}`,
+      };
+      setSelectedValue(defaultValue);
+      setValue("bobotkriteria", response.data.bobotkriteria);
+      setValue("min_nilai", response.data.min_nilai);
+      setValue("max_nilai", response.data.max_nilai);
+      setValue("nilai", response.data.nilai);
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [showMinMax]);
 
   return (
     <>
@@ -112,7 +147,7 @@ export default function InputBobotKriteria() {
             <div className="rounded-t bg-white mb-0 px-6 py-6">
               <div className="text-center flex justify-between">
                 <h6 className="text-slate-700 text-xl font-bold">
-                  Tambah Bobot Kriteria
+                  Ubah Bobot Kriteria
                 </h6>
                 <div>
                   <button
@@ -144,20 +179,18 @@ export default function InputBobotKriteria() {
                       <Controller
                         name="kode_kriteria"
                         control={control}
-                        rules={{ required: true }}
                         render={({ field }) => (
                           <Select
                             {...field}
                             instanceId="select-kode-kriteria"
                             options={selectedOption}
                             placeholder="Pilih Kode Kriteria"
-                            isClearable
+                            value={selectedValue}
                           />
                         )}
                       />
                     </div>
                   </div>
-
                   <div className="w-full px-4">
                     <div className="flex items-center mb-3">
                       <input
@@ -165,8 +198,9 @@ export default function InputBobotKriteria() {
                         type="checkbox"
                         value=""
                         name="bordered-radio"
-                        onChange={handleCheckboxChange}
-                        className="w-4 h-4 text-red-500 bg-gray-100 border-gray-300 focus:ring-red-500 dark:focus:ring-red-500"
+                        checked={showMinMax}
+                        disabled
+                        className="w-4 h-4 text-red-500 bg-gray-100 border-gray-300 focus:ring-red-500 dark:focus:ring-red-500 disabled:opacity-50"
                       />
                       <label
                         htmlFor="bordered-radio-1"
@@ -246,4 +280,4 @@ export default function InputBobotKriteria() {
   );
 }
 
-InputBobotKriteria.layout = Admin;
+UbahBobotKriteria.layout = Admin;

@@ -8,12 +8,8 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-export default function InputJenisKendaraan() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const onMenuOpen = () => setIsMenuOpen(true);
-  const onMenuClose = () => setIsMenuOpen(false);
-  const [tujuanOptions, setTujuanOptions] = useState([]);
-
+export default function UbahJenisKendaraan() {
+  const [isLoading, setLoading] = useState(false);
   const token = Cookies.get("token");
   const router = useRouter();
   const {
@@ -22,11 +18,13 @@ export default function InputJenisKendaraan() {
     handleSubmit,
     control,
     reset,
+    setValue,
   } = useForm();
+
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/api/jeniskendaraan/create",
+      const response = await axios.put(
+        `http://localhost:3001/api/jeniskendaraan/update/${router.query.slug}`,
         {
           jenis_kendaraan: data?.jenis_kendaraan,
           kapasitas_muatan: data?.kapasitas_muatan,
@@ -38,15 +36,46 @@ export default function InputJenisKendaraan() {
           },
         }
       );
-      console.log("Response:", response.data);
-      toast.success("Jenis kendaraan berhasil ditambahkan");
-      // Reset form after successful submission
-      reset();
+      toast.success(response.data.success.messages);
+      router.push("/admin/jeniskendaraan");
     } catch (error) {
       toast.error(error.message);
       console.error("Error:", error);
     }
   };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/jeniskendaraan/getbyid/${router.query.slug}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setValue("jenis_kendaraan", response.data.jenis_kendaraan);
+      setValue("kapasitas_muatan", response.data.kapasitas_muatan);
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setLoading(false);
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <>
       <div className="flex flex-wrap">
@@ -55,13 +84,13 @@ export default function InputJenisKendaraan() {
             <div className="rounded-t bg-white mb-0 px-6 py-6">
               <div className="text-center flex justify-between">
                 <h6 className="text-slate-700 text-xl font-bold">
-                  Tambah Jenis Kendaraan
+                  Ubah Jenis Kendaraan
                 </h6>
                 <div>
                   <button
                     className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                    onClick={() => handleSubmit(onSubmit)()}
                     type="button"
+                    onClick={() => handleSubmit(onSubmit)()}
                   >
                     <i className="fas fa-save mr-2"></i>Simpan
                   </button>
@@ -82,13 +111,13 @@ export default function InputJenisKendaraan() {
                   <div className="w-full  px-4">
                     <div className="relative w-full mb-3">
                       <label className="block uppercase  text-xs font-bold mb-2">
-                        Jenis Kendaran
+                        Jenis Kendaraan
                       </label>
                       <input
                         type="text"
-                        {...register("jenis_kendaraan", { required: true })}
                         placeholder="Jenis Kendaraan"
                         className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        {...register("jenis_kendaraan", { required: true })}
                       />
                       {errors?.jenis_kendaraan && (
                         <span className="mt-1 text-xs italic text-red-500">
@@ -98,16 +127,17 @@ export default function InputJenisKendaraan() {
                     </div>
                   </div>
                   <div className="w-full px-4">
-                    <div className="relative w-full mb-3">
+                    <div className="relative w-full mb-3 ">
                       <label className="block uppercase  text-xs font-bold mb-2">
-                        Kapasitas Muatan
+                        Kapasitas Muatan (KG)
                       </label>
                       <input
                         type="text"
-                        {...register("kapasitas_muatan", { required: true })}
                         placeholder="Kapasitas Muatan"
                         className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                        {...register("kapasitas_muatan", { required: true })}
                       />
+
                       {errors?.kapasitas_muatan && (
                         <span className="mt-1 text-xs italic text-red-500">
                           {errors.kapasitas_muatan.message}
@@ -125,4 +155,4 @@ export default function InputJenisKendaraan() {
   );
 }
 
-InputJenisKendaraan.layout = Admin;
+UbahJenisKendaraan.layout = Admin;

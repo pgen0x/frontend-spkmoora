@@ -31,8 +31,9 @@ export default function AturanPenilaian() {
     {
       Header: () => <div></div>,
       accessor: "id",
-      // @ts-ignore
-      Cell: ({ row }) => <>{row.values.id && <TableDropdown />}</>,
+      Cell: ({ row }) => (
+        <>{row.values.id && <TableDropdown id={row.values.id} />}</>
+      ),
       disableSortBy: true,
     },
   ];
@@ -71,7 +72,6 @@ export default function AturanPenilaian() {
     fetchData();
   }, []);
 
-  console.log(data);
   return (
     <>
       <div className="flex flex-wrap mt-4">

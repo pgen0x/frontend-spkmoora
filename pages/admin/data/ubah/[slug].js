@@ -7,14 +7,13 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import toast from "react-hot-toast";
-export default function InputKriteriaPenilaian() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const onMenuOpen = () => setIsMenuOpen(true);
-  const onMenuClose = () => setIsMenuOpen(false);
-  const [tujuanOptions, setTujuanOptions] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [kriteriaPenilaian, setDataKriteriaPenilaian] = useState([]);
 
+export default function UbahData() {
+  const [showMinMax, setShowMinMax] = useState(null);
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+  const [tujuanOptions, setTujuanOptions] = useState([]);
+  const [kriteriaPenilaian, setDataKriteriaPenilaian] = useState([]);
   const token = Cookies.get("token");
   const router = useRouter();
   const {
@@ -22,8 +21,68 @@ export default function InputKriteriaPenilaian() {
     register,
     handleSubmit,
     control,
-    reset,
+    setValue,
   } = useForm();
+
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3001/api/data/update/${router.query.slug}`,
+        {
+          nama_rute: data?.nama_rute,
+          tanggal_pengiriman: data?.tanggal_pengiriman,
+          total_berat_paket: data?.total_berat_paket,
+          tujuan: selectedValue.value,
+          total_paket: data?.total_paket,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Response:", response.data);
+      toast.success(response.data.success.messages);
+      router.push("/admin/data");
+    } catch (error) {
+      toast.error(error.message);
+      console.error("Error:", error);
+    }
+  };
+
+  async function fetchData() {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/data/getbyid/${router.query.slug}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setValue("nama_rute", response.data.nama_rute);
+      const formattedDate = response.data.tanggal_pengiriman.slice(0, 10); // Extract the date part
+      setValue("tanggal_pengiriman", formattedDate);
+      setValue("total_paket", response.data.total_paket);
+      const defaultOption = tujuanOptions.find(
+        (option) => option.value === response.data.tujuan
+      );
+      setSelectedValue(defaultOption);
+      setValue("total_berat_paket", response.data.total_berat_paket);
+      console.log("data", response.data);
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        // If token is expired, log out the user or refresh the token
+        Cookies.remove("token");
+        toast.error("Token kedaluwarsa. Silahkan login kembali");
+        router.push("/");
+      } else {
+        toast.error(error.message);
+        console.error(error);
+      }
+    }
+  }
 
   useEffect(() => {
     async function fetchTujuanOptions() {
@@ -52,43 +111,11 @@ export default function InputKriteriaPenilaian() {
           router.push("/");
         } else {
           toast.error(error.message);
-
           console.error(error);
         }
       }
     }
-    fetchTujuanOptions();
-  }, []);
 
-  const onSubmit = async (data) => {
-    try {
-      const response = await axios.post(
-        "http://localhost:3001/api/data/create",
-        {
-          nama_rute: data?.nama_rute,
-          tanggal_pengiriman: data?.tanggal_pengiriman,
-          total_berat_paket: data?.total_berat_paket,
-          tujuan: data?.tujuan.value,
-          total_paket: data?.total_paket,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Response:", response.data);
-      toast.success("Data berhasil ditambahkan");
-      // Reset form after successful submission
-      reset();
-    } catch (error) {
-      toast.error(error.message);
-      console.error("Error:", error);
-    }
-  };
-
-  useEffect(() => {
     async function fetchKriteriaOptions() {
       try {
         const response = await axios.get(
@@ -101,6 +128,7 @@ export default function InputKriteriaPenilaian() {
         );
         setDataKriteriaPenilaian(response.data);
         console.log(response.data);
+        fetchTujuanOptions(); // Fetch tujuanOptions after fetching kriteriaOptions
       } catch (error) {
         if (error.response && error.response.status === 401) {
           // If token is expired, log out the user or refresh the token
@@ -109,13 +137,19 @@ export default function InputKriteriaPenilaian() {
           router.push("/");
         } else {
           toast.error(error.message);
-
           console.error(error);
         }
       }
     }
-    fetchKriteriaOptions();
+
+    fetchKriteriaOptions(); // Fetch kriteriaOptions first
   }, []);
+
+  useEffect(() => {
+    if (tujuanOptions.length > 0) {
+      fetchData(); // Fetch data only when tujuanOptions has values
+    }
+  }, [tujuanOptions]);
 
   return (
     <>
@@ -124,9 +158,7 @@ export default function InputKriteriaPenilaian() {
           <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-slate-100 border-0">
             <div className="rounded-t bg-white mb-0 px-6 py-6">
               <div className="text-center flex justify-between">
-                <h6 className="text-slate-700 text-xl font-bold">
-                  Tambah Data
-                </h6>
+                <h6 className="text-slate-700 text-xl font-bold">Ubah Data</h6>
                 <div>
                   <button
                     className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
@@ -222,14 +254,14 @@ export default function InputKriteriaPenilaian() {
                               <Controller
                                 name="tujuan"
                                 control={control}
-                                rules={{ required: true }}
                                 render={({ field }) => (
                                   <Select
                                     {...field}
                                     instanceId="select-tujuan"
                                     options={tujuanOptions}
                                     placeholder={`Pilih ${item.nama_kriteria}`}
-                                    isClearable
+                                    value={selectedValue}
+                                    onChange={setSelectedValue}
                                   />
                                 )}
                               />
@@ -277,4 +309,4 @@ export default function InputKriteriaPenilaian() {
   );
 }
 
-InputKriteriaPenilaian.layout = Admin;
+UbahData.layout = Admin;

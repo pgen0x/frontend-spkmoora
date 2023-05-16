@@ -96,27 +96,7 @@ export default function Sidebar() {
                   Dashboard
                 </Link>
               </li>
-              <li className="items-center">
-                <Link
-                  href="/admin/data"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/admin/data") !== -1
-                      ? "text-red-500 hover:text-red-600"
-                      : "text-slate-700 hover:text-slate-500")
-                  }
-                >
-                  <i
-                    className={
-                      "fas fa-chart-bar mr-2 text-sm " +
-                      (router.pathname.indexOf("/admin/data") !== -1
-                        ? "opacity-75"
-                        : "text-slate-300")
-                    }
-                  ></i>{" "}
-                  Data
-                </Link>
-              </li>
+
               <li className="items-center">
                 <Link
                   href="/admin/kriteriapenilaian"
@@ -200,6 +180,27 @@ export default function Sidebar() {
                     }
                   ></i>
                   Jenis Kendaraan
+                </Link>
+              </li>
+              <li className="items-center">
+                <Link
+                  href="/admin/data"
+                  className={
+                    "text-xs uppercase py-3 font-bold block " +
+                    (router.pathname.indexOf("/admin/data") !== -1
+                      ? "text-red-500 hover:text-red-600"
+                      : "text-slate-700 hover:text-slate-500")
+                  }
+                >
+                  <i
+                    className={
+                      "fas fa-chart-bar mr-2 text-sm " +
+                      (router.pathname.indexOf("/admin/data") !== -1
+                        ? "opacity-75"
+                        : "text-slate-300")
+                    }
+                  ></i>{" "}
+                  Data
                 </Link>
               </li>
               <li className="items-center">

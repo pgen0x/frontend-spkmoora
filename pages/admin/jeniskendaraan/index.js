@@ -28,8 +28,9 @@ export default function KriteriaPenilaian() {
     {
       Header: () => <div></div>,
       accessor: "id",
-      // @ts-ignore
-      Cell: ({ row }) => <>{row.values.id && <TableDropdown />}</>,
+      Cell: ({ row }) => (
+        <>{row.values.id && <TableDropdown id={row.values.id} />}</>
+      ),
       disableSortBy: true,
     },
   ];

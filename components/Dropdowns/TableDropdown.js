@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/router";
 
-const NotificationDropdown = () => {
+const NotificationDropdown = ({id}) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const router = useRouter();
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -25,25 +28,20 @@ const NotificationDropdown = () => {
   return (
     <>
       <div ref={dropdownRef} className="relative">
-        <a
-          className="text-slate-500 py-1 px-3"
-          href="#action"
-          onClick={toggleDropdown}
-        >
+        <a className="text-slate-500 py-1 px-3" onClick={toggleDropdown}>
           <i className="fas fa-ellipsis-v"></i>
         </a>
         {isOpen && (
           <div className="absolute z-50 right-0 top-full mt-2 py-2 w-48 bg-white rounded-md shadow-lg">
-            <a
-              href="#edit"
+            <Link
+              href={`${router.pathname}/ubah/${id}`}
               className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
               onClick={() => {
-                console.log("Another action clicked!");
                 setIsOpen(false);
               }}
             >
               <i className="fas fa-pen mr-2"></i>Ubah
-            </a>
+            </Link>
             <a
               href="#delete"
               className="block px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-100 hover:text-zinc-900"
