@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import Link from "next/link";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import Auth from "layouts/Auth.js";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
-import { redirect } from "next/dist/server/api-utils";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -130,7 +127,7 @@ export default function Login() {
                           type="submit"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Sign In
+                          Masuk
                         </button>
                       </>
                     )}
