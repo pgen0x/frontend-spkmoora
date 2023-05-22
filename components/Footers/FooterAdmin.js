@@ -11,7 +11,7 @@ export default function FooterAdmin() {
               <div className="text-sm text-slate-500 font-semibold py-1 text-center md:text-left">
                 Copyright © {new Date().getFullYear()}{" "}
                 <a
-                  href="https://www.creative-tim.com?ref=nnjs-footer-admin"
+                  href="https://amnst.xyz/"
                   className="text-slate-500 hover:text-slate-700 text-sm font-semibold py-1"
                 >
                   Ilham Nst

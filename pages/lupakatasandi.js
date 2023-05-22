@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import Link from "next/link";
 
-export default function Login() {
+export default function Lupakatasandi() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
@@ -19,24 +19,24 @@ export default function Login() {
   const onSubmit = async (data) => {
     setSubmitting(true);
     const email = data.email;
-    const password = data.password;
-    const response = await fetch("http://localhost:3001/api/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+
+    const response = await fetch(
+      "http://localhost:3001/api/user/forgetpassword",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
     const res = await response.json();
     console.log(res);
-    if (res.token) {
-      // Save the JWT token to localStorage
-      Cookies.set("token", res.token);
-      Cookies.set("email", res.user.email);
-      toast.success("Berhasil masuk");
-      router.push("/admin/dashboard");
+    if (res.success) {
+      toast.success(res.success.messages);
+      setSubmitting(false);
     } else {
-      console.error("Login failed:", res.error);
+      console.error("Gagal Mengirimkan Password", res.error);
       toast.error(res.error.messages);
       setSubmitting(false);
     }
@@ -49,7 +49,7 @@ export default function Login() {
             <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-slate-200 border-0">
               <div className="flex-auto  lg:px-10 pt-0 rounded-t mb-0 px-6 py-6">
                 <div className="text-slate-400 text-center mb-6 font-bold mt-8">
-                  <h4>Silahkan masuk untuk melanjutkan</h4>
+                  <h4>Silahkan masukan email untuk reset kata sandi</h4>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="relative w-full mb-3">
@@ -68,26 +68,6 @@ export default function Login() {
                     {errors.email && (
                       <span className="text-red-500 text-xs italic mt-1">
                         {errors.email.message}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase  text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Password"
-                      {...register("password", { required: true })}
-                    />
-                    {errors.password && (
-                      <span className="text-red-500 text-xs italic mt-1">
-                        {errors.password.message}
                       </span>
                     )}
                   </div>
@@ -128,7 +108,7 @@ export default function Login() {
                           type="submit"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Masuk
+                          Kirim Email Konfirmasi
                         </button>
                       </>
                     )}
@@ -138,8 +118,8 @@ export default function Login() {
             </div>
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
-                <Link href="/lupakatasandi" className="text-slate-200">
-                  <small>Lupa Kata Sandi?</small>
+                <Link href="/" className="text-slate-200">
+                  <small>Sudah Punya Akun?</small>
                 </Link>
               </div>
             </div>
@@ -150,4 +130,4 @@ export default function Login() {
   );
 }
 
-Login.layout = Auth;
+Lupakatasandi.layout = Auth;

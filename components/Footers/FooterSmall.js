@@ -17,7 +17,7 @@ export default function FooterSmall(props) {
               <div className="text-sm text-slate-500 font-semibold py-1 text-center md:text-left">
                 Copyright © {new Date().getFullYear()}{" "}
                 <a
-                  href="https://www.creative-tim.com?ref=nnjs-footer-small"
+                  href="https://amnst.xyz/"
                   className="text-white hover:text-slate-300 text-sm font-semibold py-1"
                 >
                   Ilham Nst

@@ -6,40 +6,45 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import Link from "next/link";
 
-export default function Login() {
+export default function ResetPassword() {
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
+  const { token } = router.query;
+
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm();
-
   const onSubmit = async (data) => {
     setSubmitting(true);
-    const email = data.email;
-    const password = data.password;
-    const response = await fetch("http://localhost:3001/api/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    const newPassword = data.newPassword;
+
+    const response = await fetch(
+      `http://localhost:3001/api/user/resetpassword`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token, newPassword }),
+      }
+    );
     const res = await response.json();
     console.log(res);
-    if (res.token) {
-      // Save the JWT token to localStorage
-      Cookies.set("token", res.token);
-      Cookies.set("email", res.user.email);
-      toast.success("Berhasil masuk");
-      router.push("/admin/dashboard");
+    if (res.success) {
+      toast.success(res.success.messages);
+      setTimeout(() => {
+        router.push("/");
+      }, 5000);
     } else {
-      console.error("Login failed:", res.error);
+      console.error("Reset password failed:", res.error);
       toast.error(res.error.messages);
       setSubmitting(false);
     }
+
   };
   return (
     <>
@@ -49,46 +54,50 @@ export default function Login() {
             <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-slate-200 border-0">
               <div className="flex-auto  lg:px-10 pt-0 rounded-t mb-0 px-6 py-6">
                 <div className="text-slate-400 text-center mb-6 font-bold mt-8">
-                  <h4>Silahkan masuk untuk melanjutkan</h4>
+                  <h4>Silahkan masukan kata sandi baru anda</h4>
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)}>
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase  text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
-                      Email
+                    <label className="block uppercase  text-xs font-bold mb-2">
+                      Kata sandi baru
                     </label>
                     <input
-                      type="email"
+                      type="password"
+                      placeholder="Kata sandi baru"
                       className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Email"
-                      {...register("email", { required: true })}
+                      {...register("newPassword", {
+                        required: "Password is required",
+                      })}
                     />
-                    {errors.email && (
-                      <span className="text-red-500 text-xs italic mt-1">
-                        {errors.email.message}
-                      </span>
+                    {errors.newPassword && (
+                      <p className="text-red-500 text-xs italic mt-1">
+                        {errors.newPassword.message}
+                      </p>
                     )}
                   </div>
 
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase  text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
-                      Password
+                    <label className="block uppercase  text-xs font-bold mb-2">
+                      Konfirmasi kata sandi baru
                     </label>
                     <input
                       type="password"
+                      placeholder="Konfirmasi kata sandi baru"
                       className="border-0 px-3 py-3 placeholder-slate-300  bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Password"
-                      {...register("password", { required: true })}
+                      {...register("confirmPassword", {
+                        required: "Password is required",
+                        validate: (value) => {
+                          return (
+                            value === watch("newPassword") ||
+                            "Konfirmasi kata sandi tidak cocok dengan kata sandi baru"
+                          );
+                        },
+                      })}
                     />
-                    {errors.password && (
-                      <span className="text-red-500 text-xs italic mt-1">
-                        {errors.password.message}
-                      </span>
+                    {errors.confirmPassword && (
+                      <p className="text-red-500 text-xs italic mt-1">
+                        {errors.confirmPassword.message}
+                      </p>
                     )}
                   </div>
 
@@ -128,7 +137,7 @@ export default function Login() {
                           type="submit"
                           onClick={handleSubmit(onSubmit)}
                         >
-                          Masuk
+                          Reset Kata Sandi
                         </button>
                       </>
                     )}
@@ -138,8 +147,8 @@ export default function Login() {
             </div>
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
-                <Link href="/lupakatasandi" className="text-slate-200">
-                  <small>Lupa Kata Sandi?</small>
+                <Link href="/" className="text-slate-200">
+                  <small>Sudah Punya Akun?</small>
                 </Link>
               </div>
             </div>
@@ -150,4 +159,4 @@ export default function Login() {
   );
 }
 
-Login.layout = Auth;
+ResetPassword.layout = Auth;
