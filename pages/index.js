@@ -20,27 +20,41 @@ export default function Login() {
     setSubmitting(true);
     const email = data.email;
     const password = data.password;
-    const response = await fetch("http://localhost:3001/api/user/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    const res = await response.json();
-    console.log(res);
-    if (res.token) {
-      // Save the JWT token to localStorage
-      Cookies.set("token", res.token);
-      Cookies.set("email", res.user.email);
-      toast.success("Berhasil masuk");
-      router.push("/admin/dashboard");
-    } else {
-      console.error("Login failed:", res.error);
-      toast.error(res.error.messages);
+
+    try {
+      const response = await fetch("http://localhost:3001/api/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const res = await response.json();
+        console.log(res);
+
+        if (res.token) {
+          // Save the JWT token to localStorage
+          Cookies.set("token", res.token);
+          Cookies.set("email", res.user.email);
+          toast.success("Berhasil masuk");
+          router.push("/admin/dashboard");
+        } else {
+          console.error("Login failed:", res.error);
+          toast.error(res.error.messages);
+          setSubmitting(false);
+        }
+      } else {
+        throw new Error("Request failed with status: " + response.status);
+      }
+    } catch (error) {
+      console.error("Error occurred during login:", error);
+      toast.error("An error occurred during the login process.");
       setSubmitting(false);
     }
   };
+
   return (
     <>
       <div className="container mx-auto px-4 h-full">

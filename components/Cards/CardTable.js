@@ -8,7 +8,10 @@ import {
   useSortBy,
   usePagination,
 } from "react-table";
-import { read, utils, writeFileXLSX } from "xlsx";
+import { utils, writeFile } from "xlsx";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import moment from "moment";
 
 export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
   const [loading, setLoading] = useState(true);
@@ -42,13 +45,107 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
 
   const { pageIndex } = state;
 
-  const exportFile = useCallback(() => {
-    const ws = utils.json_to_sheet(data);
-    const wb = utils.book_new();
-    const sheetName = new Date().toISOString(); // Get current date-time in ISO format
-    utils.book_append_sheet(wb, ws, sheetName);
-    writeFileXLSX(wb, `${tableTitle} - ${sheetName}.xlsx`);
-  }, [data]);
+  const exportFile = useCallback(
+    async (format) => {
+      const ws = utils.json_to_sheet(data);
+
+      const wb = utils.book_new();
+      const sheetName = new Date().toISOString(); // Get current date-time in ISO format
+      utils.book_append_sheet(wb, ws, sheetName);
+
+      if (format === "xlsx") {
+        writeFile(wb, `${tableTitle} - ${sheetName}.xlsx`);
+      } else if (format === "pdf") {
+        const doc = new jsPDF("l", "pt");
+
+        // Add letterhead
+        const logoSrc = "/img/id-express.png";
+        const headerText = "PT ID Express Logistik Indonesia";
+        const headerFontSize = 16;
+        const headerMargin = 20;
+        const logoWidth = 100;
+        const logoHeight = 30;
+
+        // Load logo image
+        const logoDataUrl = await fetch(logoSrc)
+          .then((response) => response.blob())
+          .then((blob) => URL.createObjectURL(blob));
+
+        // Calculate page dimensions
+        const pageWidth = doc.internal.pageSize.getWidth();
+
+        // Calculate logo and text positions
+        const logoX = (pageWidth - logoWidth) / 2;
+        const logoY = headerMargin;
+        const headerTextX = (pageWidth - doc.getTextWidth(headerText)) / 2;
+        const headerTextY = logoY + logoHeight + headerMargin;
+
+        // Add logo image
+        doc.addImage(logoDataUrl, "PNG", logoX, logoY, logoWidth, logoHeight);
+
+        // Add header text
+        doc.setFontSize(headerFontSize);
+        doc.text(headerTextX, headerTextY, headerText);
+
+        // Extract headers dynamically
+        const excludedFields = [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "jenisKendaraanId",
+        ];
+        const headers = Object.keys(data[0]).filter(
+          (key) => !excludedFields.includes(key)
+        );
+        const columns = headers.map((header) => {
+          return { header, dataKey: header };
+        });
+
+        // Convert object data to array of arrays and handle nested object
+        const tableData = data.map((item) => {
+          const rowData = headers.map((header) => {
+            const value = item[header];
+            if (header === "tanggal_pengiriman") {
+              return moment(value).format("DD MMMM YYYY");
+            } else if (typeof value === "object") {
+              return value.jenis_kendaraan;
+            } else {
+              return value;
+            }
+          });
+          return rowData;
+        });
+
+        // Add table
+        const tableMargin = headerTextY + headerMargin;
+        const fontSize = 9;
+        const cellPadding = 5;
+
+        const tableConfig = {
+          startY: tableMargin,
+          styles: {
+            fontSize: fontSize,
+            cellPadding: cellPadding,
+            textColor: [0, 0, 0],
+          },
+          headStyles: {
+            fillColor: [200, 200, 200],
+          },
+          columnStyles: {
+            // Customize styles for specific columns if needed
+          },
+          margin: { left: tableMargin, right: tableMargin },
+        };
+
+        doc.autoTable(columns, tableData, tableConfig);
+
+        // Save PDF file
+        const fileName = `${tableTitle} - ${sheetName}.pdf`;
+        doc.save(fileName);
+      }
+    },
+    [data]
+  );
 
   return (
     <>
@@ -99,14 +196,25 @@ export default function CardTable({ color, tableTitle, COLUMNS, dataTable }) {
                     </button>
                   </Link>
                 ) : (
-                  <button
-                    className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
-                    type="button"
-                    onClick={exportFile}
-                  >
-                    <i className="fas fa-file-export mr-1"></i> Export{" "}
-                    {tableTitle}
-                  </button>
+                  <div>
+                    <button
+                      className="mb-2 bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                      type="button"
+                      onClick={() => exportFile("xlsx")}
+                    >
+                      <i className="fas fa-file-export mr-1"></i> Export{" "}
+                      {tableTitle} as XLSX
+                    </button>
+
+                    <button
+                      className="bg-slate-700 active:bg-slate-600 text-white font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 ease-linear transition-all duration-150"
+                      type="button"
+                      onClick={() => exportFile("pdf")}
+                    >
+                      <i className="fas fa-file-export mr-1"></i> Export{" "}
+                      {tableTitle} as PDF
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

@@ -17,30 +17,37 @@ export default function Lupakatasandi() {
   } = useForm();
 
   const onSubmit = async (data) => {
-    setSubmitting(true);
-    const email = data.email;
+    try {
+      setSubmitting(true);
+      const email = data.email;
 
-    const response = await fetch(
-      "http://localhost:3001/api/user/forgetpassword",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
+      const response = await fetch(
+        "http://localhost:3001/api/user/forgetpassword",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+      const res = await response.json();
+      console.log(res);
+      if (res.success) {
+        toast.success(res.success.messages);
+        setSubmitting(false);
+      } else {
+        console.error("Gagal Mengirimkan Password", res.error);
+        toast.error(res.error.messages);
+        setSubmitting(false);
       }
-    );
-    const res = await response.json();
-    console.log(res);
-    if (res.success) {
-      toast.success(res.success.messages);
-      setSubmitting(false);
-    } else {
-      console.error("Gagal Mengirimkan Password", res.error);
-      toast.error(res.error.messages);
+    } catch (error) {
+      console.error("Error occurred during password reset:", error);
+      toast.error("An error occurred during the password reset process.");
       setSubmitting(false);
     }
   };
+
   return (
     <>
       <div className="container mx-auto px-4 h-full">

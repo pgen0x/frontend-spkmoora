@@ -22,28 +22,40 @@ export default function ResetPassword() {
     setSubmitting(true);
     const newPassword = data.newPassword;
 
-    const response = await fetch(
-      `http://localhost:3001/api/user/resetpassword`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token, newPassword }),
+    try {
+      const response = await fetch(
+        `http://localhost:3001/api/user/resetpassword`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token, newPassword }),
+        }
+      );
+
+      if (response.ok) {
+        const res = await response.json();
+        console.log(res);
+        if (res.success) {
+          toast.success(res.success.messages);
+          setTimeout(() => {
+            router.push("/");
+          }, 5000);
+        } else {
+          console.error("Reset password failed:", res.error);
+          toast.error(res.error.messages);
+          setSubmitting(false);
+        }
+      } else {
+        throw new Error("Request failed with status: " + response.status);
       }
-    );
-    const res = await response.json();
-    console.log(res);
-    if (res.success) {
-      toast.success(res.success.messages);
-      setTimeout(() => {
-        router.push("/");
-      }, 5000);
-    } else {
-      console.error("Reset password failed:", res.error);
-      toast.error(res.error.messages);
+    } catch (error) {
+      console.error("Error occurred during reset password:", error);
+      toast.error("An error occurred during the password reset process.");
       setSubmitting(false);
     }
+
 
   };
   return (

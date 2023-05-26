@@ -34,7 +34,7 @@ export default class MyApp extends App {
         <Layout>
           <NextNProgress color="rgb(240 68 68)" />
           <Component {...pageProps} />
-          <Toaster toastOptions={{ duration: 5000 }} />
+          <Toaster toastOptions={{ duration: 3500 }} />
         </Layout>
       </React.Fragment>
     );
